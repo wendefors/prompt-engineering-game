@@ -64,18 +64,15 @@ export const MarketingPage: React.FC = () => {
         {/* CTA */}
         <div className="text-center p-8 bg-black/40 rounded-xl">
             <h3 className="text-2xl font-bold text-white mb-4">Kontakt</h3>
-            <p className="mb-6 text-gray-300">Vill du diskutera detta vidare? Kontakta XLENT i valfri kanal eller klicka på länken nedan.</p>
-            <div className="flex justify-center">
-                {/* Simulated QR Code */}
-                <div className="w-32 h-32 bg-white p-2 rounded-lg">
-                    <div className="w-full h-full bg-black flex items-center justify-center text-white text-xs text-center font-mono">
-                        [QR KOD]
-                        <br/>
-                        XLENT
-                    </div>
-                </div>
-            </div>
-            <div className="mt-8">
+            <p className="mb-6 text-gray-300">Vill du diskutera detta vidare? Kontakta XLENT i valfri kanal eller klicka på knappen nedan.</p>
+            
+            <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-8">
+                <Button 
+                    variant="primary" 
+                    onClick={() => window.location.href = "mailto:gustav.wendefors@xlent.se?subject=Utbildning%20inom%20Prompt%20Engineering"}
+                >
+                    JAG VILL VETA MER
+                </Button>
                 <Button variant="arcade" onClick={() => window.location.reload()}>SPELA IGEN</Button>
             </div>
         </div>

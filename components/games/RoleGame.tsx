@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, Hammer, Utensils, Pizza, Carrot, Smartphone, Wrench, ChefHat } from 'lucide-react';
 
 interface RoleGameProps {
@@ -97,25 +97,27 @@ export const RoleGame: React.FC<RoleGameProps> = ({ isHardMode, onComplete }) =>
   return (
     <div className="w-full h-full flex flex-col bg-slate-800 relative overflow-hidden">
       
-      {/* HUD - Fixed layout handling for long text */}
-      <div className="bg-slate-900 p-4 border-b-4 border-slate-700 flex justify-between items-center z-20 min-h-[6rem] shrink-0 gap-4">
-         <div className="flex flex-col flex-1 min-w-0">
+      {/* HUD - Fixed layout handling for long text using flex-1 and min-w-0 */}
+      <div className="bg-slate-900 p-4 border-b-4 border-slate-700 flex justify-between items-start z-20 shrink-0 gap-4">
+         <div className="flex flex-col flex-1 min-w-0 justify-center min-h-[3.5rem]">
              {isHardMode ? (
-                 <div className="font-arcade text-sm md:text-base mb-1 text-red-400 animate-pulse break-words leading-tight">
-                    PROMPT: SAMLA DET DU BEHÖVER FÖR ATT LÖSA UPPGIFTEN
+                 <div className="font-arcade text-sm md:text-base text-red-400 animate-pulse leading-tight">
+                    <div>PROMPT: SAMLA DET DU</div>
+                    <div>BEHÖVER FÖR ATT LÖSA UPPGIFTEN</div>
                  </div>
              ) : (
-                 <div className="font-arcade text-sm md:text-base mb-1 text-yellow-400 leading-tight">
-                    <div className="mb-1">ROLL: KOCK</div>
-                    <div className="break-words">PROMPT: SAMLA DET DU BEHÖVER FÖR ATT LÖSA UPPGIFTEN</div>
+                 <div className="font-arcade text-sm md:text-base text-yellow-400 leading-tight">
+                    <div className="mb-1 text-green-400">ROLL: KOCK</div>
+                    <div>PROMPT: SAMLA DET DU</div>
+                    <div>BEHÖVER FÖR ATT LÖSA UPPGIFTEN</div>
                  </div>
              )}
-             <div className="text-xs text-gray-400 font-mono mt-1">
-                 {isHardMode ? "Vilken typ av objekt behöver du?" : "Vilken typ av objekt behöver du?"}
+             <div className="text-xs text-gray-400 font-mono mt-2">
+                 {isHardMode ? "Vilken typ av objekt behöver du?" : "Samla ingredienser och köksredskap."}
              </div>
          </div>
          
-         <div className="text-right shrink-0 whitespace-nowrap">
+         <div className="text-right shrink-0 whitespace-nowrap pt-1">
              <div className="font-arcade text-white text-lg mb-1">TID: {timeLeft}</div>
              <div className="font-arcade text-green-400 text-lg">POÄNG: {score}</div>
          </div>
@@ -152,6 +154,7 @@ export const RoleGame: React.FC<RoleGameProps> = ({ isHardMode, onComplete }) =>
                     height: '80px'
                 }}
               >
+                {/* Always Uniform Color: bg-slate-600 */}
                 <div className="w-full h-full rounded-full flex items-center justify-center border-4 shadow-lg bg-slate-600 border-slate-400 text-white">
                     {item.icon}
                 </div>
