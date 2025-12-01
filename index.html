@@ -2,10 +2,18 @@
 <html lang="sv">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Prompt Master: The Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Prompt Master: The XLENT Game</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
     <script>
       tailwind.config = {
         theme: {
@@ -35,30 +43,845 @@
         color: #f3f4f6;
         overflow-x: hidden;
       }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #2A3C35; 
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #4B6F63; 
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #5d8a7a; 
+      }
     </style>
-<script type="importmap">
+  <script type="importmap">
 {
   "imports": {
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "vite": "https://aistudiocdn.com/vite@^7.2.6",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
     "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.25",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
     "canvas-confetti": "https://aistudiocdn.com/canvas-confetti@^1.9.4"
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
   <body>
-    <div id="root">
-      <div style="height: 100vh; display: flex; align-items: center; justify-content: center; color: white; font-family: monospace; text-align: center; padding: 20px;">
-        Laddar Prompt Master...<br/><br/>
-        (Om denna text syns länge: Appen måste byggas via 'npm run build' eller laddas upp till GitHub Pages för att fungera. Den fungerar inte genom att bara öppna filen lokalt.)
-      </div>
-    </div>
-    <script type="module" src="./index.tsx"></script>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+      import React, { useState, useEffect } from 'https://esm.sh/react@18.2.0';
+      import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
+      import { 
+        Shield, Hammer, Utensils, Pizza, Carrot, Smartphone, Wrench, ChefHat,
+        ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Flag, Skull,
+        Ghost, Bot, User, XCircle, CheckCircle,
+        Zap, AlertTriangle, Brain 
+      } from 'https://esm.sh/lucide-react@0.344.0';
+      import { motion, AnimatePresence } from 'https://esm.sh/framer-motion@11.0.8';
+      import confetti from 'https://esm.sh/canvas-confetti@1.9.2';
+
+      // --- CONSTANTS ---
+      const MARKETING_DATA = {
+        title: "FÖRELÄSNING: PROMPT ENGINEERING",
+        subtitle: "Skapa tydliga och träffsäkra promptar – och höj kvaliteten i ert AI-arbete",
+        challenges: [
+          "Svårt att få konsekventa och tillförlitliga AI-svar",
+          "Otydliga promptar leder till spekulationer eller felaktigheter",
+          "Resultat blir breda eller irrelevanta när kontext saknas"
+        ],
+        solution: [
+          "Vi går igenom tekniker som ökar precision och konsekvens",
+          "Vi lär er undvika vanliga fallgropar och otydliga instruktioner",
+          "Vi visar hur små justeringar ger stora förbättringar"
+        ],
+        benefits: [
+          "Förmåga att anpassa promptar efter målgrupp och situation",
+          "Fler perspektiv och djupare resonemang i era analyser",
+          "Exempelstyrda arbetssätt som ger ökad precision"
+        ],
+        contact: "Vill du diskutera detta vidare? Kontakta XLENT."
+      };
+
+      // --- COMPONENT: BUTTON ---
+      const Button = ({ 
+        children, 
+        variant = 'primary', 
+        size = 'md', 
+        className = '', 
+        ...props 
+      }) => {
+        const baseStyles = "font-arcade uppercase transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
+        
+        const variants = {
+          primary: "bg-xlent-green text-white border-b-4 border-xlent-dark hover:bg-opacity-90",
+          danger: "bg-red-600 text-white border-b-4 border-red-800 hover:bg-red-500",
+          success: "bg-green-600 text-white border-b-4 border-green-800 hover:bg-green-500",
+          arcade: "bg-xlent-accent text-black border-b-4 border-orange-600 hover:bg-yellow-300 shadow-[0_0_15px_rgba(244,211,94,0.5)]"
+        };
+
+        const sizes = {
+          sm: "px-3 py-1 text-xs",
+          md: "px-6 py-3 text-sm",
+          lg: "px-8 py-4 text-lg"
+        };
+
+        return (
+          <button 
+            className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`} 
+            {...props}
+          >
+            {children}
+          </button>
+        );
+      };
+
+      // --- COMPONENT: ARCADE CABINET ---
+      const ArcadeCabinet = ({ children, title }) => {
+        return (
+          <div className="min-h-screen bg-gray-900 flex items-center justify-center p-2 font-sans">
+            <div className="w-full max-w-4xl bg-gray-800 rounded-3xl p-4 shadow-2xl border-4 border-gray-700 flex flex-col h-[90vh] md:h-[800px]">
+              
+              {/* Header */}
+              <div className="bg-gray-700 rounded-t-xl p-4 mb-4 flex justify-center items-center border-b-4 border-black shrink-0">
+                <h1 className="font-arcade text-lg md:text-xl text-yellow-400 tracking-widest uppercase text-center shadow-black drop-shadow-md">
+                  {title || "PROMPT MASTER"}
+                </h1>
+              </div>
+
+              {/* Screen Container */}
+              <div className="relative flex-1 bg-black rounded-lg overflow-hidden border-4 border-gray-900 shadow-inner flex flex-col w-full">
+                  <div className="w-full h-full relative">
+                    {children}
+                  </div>
+              </div>
+
+              {/* Footer / Controls Decoration */}
+              <div className="mt-6 flex justify-center gap-12 shrink-0">
+                  <div className="w-16 h-16 rounded-full bg-gray-700 border-b-8 border-gray-900 shadow-lg flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-red-600 shadow-inner active:mt-1 transition-all"></div>
+                  </div>
+                   <div className="w-16 h-16 rounded-full bg-gray-700 border-b-8 border-gray-900 shadow-lg flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-blue-600 shadow-inner active:mt-1 transition-all"></div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // --- GAME: ROLE GAME ---
+      const RoleGame = ({ isHardMode, onComplete }) => {
+        const [items, setItems] = useState([]);
+        const [score, setScore] = useState(0);
+        const [timeLeft, setTimeLeft] = useState(15); 
+        const [feedback, setFeedback] = useState(null);
+        
+        useEffect(() => {
+          const spawnTimer = setInterval(() => {
+            const isGoodItem = Math.random() > 0.4;
+            let icon;
+            let type;
+
+            if (isGoodItem) {
+                const goodIcons = [<Pizza key="p" size={32} />, <Carrot key="c" size={32} />, <Utensils key="u" size={32} />, <ChefHat key="ch" size={32} />];
+                icon = goodIcons[Math.floor(Math.random() * goodIcons.length)];
+                type = 'good';
+            } else {
+                const badIcons = [<Hammer key="h" size={32} />, <Wrench key="w" size={32} />, <Smartphone key="s" size={32} />, <Shield key="sh" size={32} />];
+                icon = badIcons[Math.floor(Math.random() * badIcons.length)];
+                type = 'bad';
+            }
+
+            setItems(prev => [
+              ...prev,
+              {
+                id: Date.now() + Math.random(),
+                x: Math.random() * 80 + 10,
+                y: -15,
+                type,
+                icon
+              }
+            ]);
+          }, 1000);
+
+          const moveTimer = setInterval(() => {
+              setItems(prev => {
+                  return prev
+                      .map(item => ({ ...item, y: item.y + 0.6 }))
+                      .filter(item => item.y < 120);
+              });
+          }, 20);
+
+          const clockTimer = setInterval(() => {
+              setTimeLeft(prev => {
+                  if (prev <= 1) {
+                      clearInterval(spawnTimer);
+                      clearInterval(moveTimer);
+                      clearInterval(clockTimer);
+                      onComplete(score > 0);
+                      return 0;
+                  }
+                  return prev - 1;
+              });
+          }, 1000);
+
+          return () => {
+              clearInterval(spawnTimer);
+              clearInterval(moveTimer);
+              clearInterval(clockTimer);
+          };
+        }, [onComplete, score]); 
+
+        const catchItem = (item) => {
+           if (item.type === 'good') {
+               setScore(s => s + 10);
+               setFeedback(isHardMode ? "RÄTT" : "BRA!");
+           } else {
+               setScore(s => Math.max(0, s - 10)); 
+               setFeedback(isHardMode ? "FEL" : "FEL OBJEKT!");
+           }
+           
+           setItems(prev => prev.filter(i => i.id !== item.id));
+           setTimeout(() => setFeedback(null), 500);
+        };
+
+        return (
+          <div className="w-full h-full flex flex-col bg-slate-800 relative overflow-hidden">
+            <div className="bg-slate-900 p-4 border-b-4 border-slate-700 flex justify-between items-start z-20 shrink-0 gap-4">
+               <div className="flex flex-col flex-1 min-w-0 justify-center min-h-[3.5rem]">
+                   {isHardMode ? (
+                       <div className="font-arcade text-sm md:text-base text-red-400 animate-pulse leading-tight">
+                          <div>PROMPT: SAMLA DET DU</div>
+                          <div>BEHÖVER FÖR ATT LÖSA UPPGIFTEN</div>
+                       </div>
+                   ) : (
+                       <div className="font-arcade text-sm md:text-base text-yellow-400 leading-tight">
+                          <div className="mb-1 text-green-400">ROLL: KOCK</div>
+                          <div>PROMPT: SAMLA DET DU</div>
+                          <div>BEHÖVER FÖR ATT LÖSA UPPGIFTEN</div>
+                       </div>
+                   )}
+                   <div className="text-xs text-gray-400 font-mono mt-2">
+                       {isHardMode ? "Vilken typ av objekt behöver du?" : "Samla ingredienser och köksredskap."}
+                   </div>
+               </div>
+               
+               <div className="text-right shrink-0 whitespace-nowrap pt-1">
+                   <div className="font-arcade text-white text-lg mb-1">TID: {timeLeft}</div>
+                   <div className="font-arcade text-green-400 text-lg">POÄNG: {score}</div>
+               </div>
+            </div>
+
+            <div className="flex-1 relative w-full bg-slate-800 overflow-hidden">
+                <div className="absolute inset-0 opacity-10" style={{ 
+                    backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)',
+                    backgroundSize: '40px 40px'
+                }}></div>
+
+                {feedback && (
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+                      <span className={`font-arcade text-2xl px-6 py-3 rounded-xl border-4 shadow-2xl ${feedback.includes('FEL') ? 'bg-red-600 border-red-800 text-white' : 'bg-green-600 border-green-800 text-white'}`}>
+                          {feedback}
+                      </span>
+                  </div>
+                )}
+
+                {items.map(item => (
+                    <button
+                      key={item.id}
+                      onPointerDown={(e) => { e.preventDefault(); catchItem(item); }}
+                      onClick={() => catchItem(item)}
+                      className="absolute transform -translate-x-1/2 p-2 rounded-full z-30 transition-transform active:scale-90 hover:scale-110 focus:outline-none"
+                      style={{ 
+                          left: `${item.x}%`, 
+                          top: `${item.y}%`,
+                          width: '80px',
+                          height: '80px'
+                      }}
+                    >
+                      <div className="w-full h-full rounded-full flex items-center justify-center border-4 shadow-lg bg-slate-600 border-slate-400 text-white">
+                          {item.icon}
+                      </div>
+                    </button>
+                ))}
+                
+                <div className="absolute bottom-10 w-full text-center pointer-events-none opacity-40">
+                   <p className="font-arcade text-white text-xs">KLICKA PÅ OBJEKTEN</p>
+                </div>
+            </div>
+          </div>
+        );
+      };
+
+      // --- GAME: TASK GAME ---
+      const TaskGame = ({ isHardMode, onComplete }) => {
+        const GRID_SIZE = 8;
+        const [playerPos, setPlayerPos] = useState({ x: 0, y: 7 }); 
+        const [moves, setMoves] = useState(0);
+        const [gameOver, setGameOver] = useState(false);
+        const [log, setLog] = useState([]);
+
+        const goals = [
+            { x: 7, y: 0, color: 'text-green-500', name: 'green', isCorrect: true },
+            { x: 0, y: 0, color: 'text-red-500', name: 'red', isCorrect: false },
+            { x: 7, y: 7, color: 'text-yellow-500', name: 'yellow', isCorrect: false }
+        ];
+        
+        const safePathStr = new Set([
+            "0,7", "1,7", "2,7", "3,7", "4,7", "5,7",
+            "5,6", "5,5",
+            "4,5", "3,5", "2,5", "1,5",
+            "1,4", "1,3",
+            "2,3", "3,3", "4,3", "5,3", "6,3",
+            "6,2", "6,1",
+            "5,1", "4,1", "3,1", "2,1",
+            "2,0", "3,0", "4,0", "5,0", "6,0", "7,0"
+        ]);
+
+        const maxMoves = 40;
+
+        useEffect(() => {
+            setLog([isHardMode ? "System: Väntar på input..." : "System: Ruttinläsning klar."]);
+        }, [isHardMode]);
+
+        const move = (dx, dy) => {
+          if (gameOver) return;
+
+          const newX = playerPos.x + dx;
+          const newY = playerPos.y + dy;
+
+          if (newX < 0 || newX >= GRID_SIZE || newY < 0 || newY >= GRID_SIZE) {
+            setLog(prev => [...prev.slice(-2), "Vägg!"]);
+            return;
+          }
+
+          setPlayerPos({ x: newX, y: newY });
+          setMoves(m => m + 1);
+
+          const coordKey = `${newX},${newY}`;
+          const isSafe = safePathStr.has(coordKey);
+          const isGoal = goals.some(g => g.x === newX && g.y === newY);
+          
+          if (!isSafe && !isGoal) {
+              setLog(prev => [...prev.slice(-2), isHardMode ? "FEL! Dolt hinder." : "VARNING! Mina!"]);
+              setPlayerPos({ x: 0, y: 7 }); 
+              return;
+          }
+
+          const hitGoal = goals.find(g => g.x === newX && g.y === newY);
+          if (hitGoal) {
+              if (isHardMode) {
+                   if (hitGoal.isCorrect) {
+                       setGameOver(true);
+                       setLog(prev => [...prev, "Mål nått!"]);
+                       setTimeout(() => onComplete(true), 1500);
+                   } else {
+                       setLog(prev => [...prev, "Fel mål!"]);
+                       setPlayerPos({ x: 0, y: 7 }); 
+                   }
+              } else {
+                  if (hitGoal.isCorrect) {
+                      setGameOver(true);
+                      setLog(prev => [...prev, "Uppdrag slutfört!"]);
+                      setTimeout(() => onComplete(true), 1500);
+                  } else {
+                      setLog(prev => [...prev, "Fel flagga, sök den gröna."]);
+                  }
+              }
+          }
+
+          if (moves + 1 >= maxMoves) {
+            setGameOver(true);
+            setLog(prev => [...prev, "Slut på energi."]);
+            setTimeout(() => onComplete(false), 1500);
+          }
+        };
+
+        return (
+          <div className="h-full w-full flex flex-col bg-gray-900 p-2 md:p-4">
+            <div className="bg-black p-3 border border-gray-700 mb-2 font-arcade text-xs text-center shadow-lg shrink-0">
+              {isHardMode ? (
+                <div className="flex flex-col gap-1">
+                    <span className="text-xlent-accent animate-pulse">PROMPT: "TA DIG TILL MÅLET."</span>
+                    <span className="text-[10px] text-gray-500">(Vilket mål är rätt? Var finns minorna?)</span>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-1">
+                     <span className="text-green-400">UPPDRAG: GÅ TILL GRÖN FLAGGA. UNDVIK MINOR.</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 flex justify-center items-center overflow-hidden min-h-0">
+              <div 
+                  className="grid gap-0.5 bg-gray-800 p-1 rounded border-4 border-gray-700 shadow-2xl"
+                  style={{ 
+                      gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
+                      width: '100%',
+                      maxWidth: '400px',
+                      aspectRatio: '1/1'
+                  }}
+              >
+                {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => {
+                  const x = i % GRID_SIZE;
+                  const y = Math.floor(i / GRID_SIZE);
+                  const isPlayer = playerPos.x === x && playerPos.y === y;
+                  const goalAtPos = goals.find(g => g.x === x && g.y === y);
+                  
+                  const coordKey = `${x},${y}`;
+                  const isSafe = safePathStr.has(coordKey);
+                  const isGoalLoc = goals.some(g => g.x === x && g.y === y);
+                  const isTrap = !isSafe && !isGoalLoc;
+                  const showTrap = !isHardMode && isTrap; 
+                  
+                  return (
+                    <div key={i} className="bg-gray-700/50 rounded-[2px] flex items-center justify-center relative border border-gray-600/20">
+                      {goalAtPos && (
+                          <Flag className={`${goalAtPos.color} drop-shadow-md`} size={isHardMode ? 20 : 20} fill="currentColor" />
+                      )}
+                      
+                      {showTrap && <Skull className="text-red-500 opacity-80" size={18} />}
+
+                      {isPlayer && (
+                        <div className="absolute inset-0 z-10 bg-blue-500 rounded-sm border border-white shadow-[0_0_8px_blue] flex items-center justify-center transition-all duration-200">
+                           <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-2 flex flex-col items-center gap-2 shrink-0">
+              <div className="grid grid-cols-3 gap-2">
+                  <div />
+                  <Button variant="arcade" size="sm" onClick={() => move(0, -1)} disabled={gameOver} className="w-12 h-12 flex items-center justify-center"><ArrowUp /></Button>
+                  <div />
+                  <Button variant="arcade" size="sm" onClick={() => move(-1, 0)} disabled={gameOver} className="w-12 h-12 flex items-center justify-center"><ArrowLeft /></Button>
+                  <Button variant="arcade" size="sm" onClick={() => move(0, 1)} disabled={gameOver} className="w-12 h-12 flex items-center justify-center"><ArrowDown /></Button>
+                  <Button variant="arcade" size="sm" onClick={() => move(1, 0)} disabled={gameOver} className="w-12 h-12 flex items-center justify-center"><ArrowRight /></Button>
+              </div>
+              
+              <div className="w-full max-w-[400px] bg-black border border-green-900 p-2 font-mono text-[10px] text-green-500 h-12 overflow-hidden flex flex-col justify-end">
+                  {log.map((l, idx) => <div key={idx} className="truncate">> {l}</div>)}
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // --- GAME: CONTEXT GAME ---
+      const ContextGame = ({ isHardMode, onComplete }) => {
+        const [queue, setQueue] = useState([]);
+        const [score, setScore] = useState(0);
+        const [feedback, setFeedback] = useState("");
+        const [processedCount, setProcessedCount] = useState(0);
+
+        const MAX_VISITORS = 10;
+
+        useEffect(() => {
+            const types = ['robot', 'robot', 'human', 'alien', 'human'];
+            const newQueue = Array.from({ length: MAX_VISITORS }).map((_, i) => ({
+                id: i,
+                type: types[Math.floor(Math.random() * types.length)]
+            }));
+            setQueue(newQueue);
+        }, []);
+
+        useEffect(() => {
+            if (processedCount >= 5) { 
+                 onComplete(score >= 30); 
+            }
+        }, [processedCount, score, onComplete]);
+
+        const currentVisitor = queue[0];
+
+        const handleDecision = (allow) => {
+            if (!currentVisitor) return;
+
+            let points = 0;
+            let msg = "";
+
+            const isCorrectAccordingToRule = 
+              (currentVisitor.type === 'robot' && allow) || 
+              (currentVisitor.type !== 'robot' && !allow);
+
+            if (isCorrectAccordingToRule) {
+                points = 10;
+                msg = "RÄTT";
+            } else {
+                points = -10;
+                msg = isHardMode ? "FEL" : "FEL! Endast robotar idag!";
+            }
+
+            setScore(s => s + points);
+            setFeedback(msg);
+            setQueue(prev => prev.slice(1));
+            setProcessedCount(c => c + 1);
+
+            setTimeout(() => setFeedback(""), 1000);
+        };
+
+        const getIcon = (type) => {
+            switch(type) {
+                case 'robot': return <Bot size={40} className="text-blue-400" />;
+                case 'human': return <User size={40} className="text-yellow-400" />;
+                case 'alien': return <Ghost size={40} className="text-green-400" />;
+            }
+        };
+
+        return (
+          <div className="h-full w-full flex flex-col bg-slate-900 relative overflow-hidden">
+             <div className="w-full bg-black border-b-4 border-gray-700 p-3 text-center z-10 shrink-0 shadow-lg">
+                  {isHardMode ? (
+                      <>
+                          <h2 className="text-xlent-accent font-arcade text-xs leading-relaxed mb-1">
+                              PROMPT: "DU ÄR DÖRRVAKT PÅ EN KLUBB, AVGÖR VILKA GÄSTER SOM SKA SLÄPPAS IN."
+                          </h2>
+                          <p className="text-red-400 text-[10px] font-mono animate-pulse">
+                              SAKNAD KONTEXT: Vem får komma in och vem ska avvisas?
+                          </p>
+                      </>
+                  ) : (
+                      <>
+                          <h2 className="text-xlent-accent font-arcade text-xs leading-relaxed mb-1">
+                             PROMPT: "DU ÄR DÖRRVAKT PÅ EN KLUBB, AVGÖR VILKA GÄSTER SOM SKA SLÄPPAS IN."
+                          </h2>
+                          <p className="text-green-400 text-[10px] font-mono">
+                              KONTEXT: Ikväll är det exklusiv robotkväll på klubben.
+                          </p>
+                      </>
+                  )}
+             </div>
+
+             <div className="absolute top-3 right-3 text-white font-arcade text-[10px] z-20 bg-black/50 px-2 py-1 rounded">
+                 SCORE: {score}
+             </div>
+
+             <div className="flex-1 flex flex-col items-center justify-end relative min-h-0 w-full overflow-hidden pb-4">
+                  <div className="h-8 flex justify-center w-full z-30 pointer-events-none mb-2">
+                      {feedback && (
+                          <span className={`
+                              font-arcade px-2 py-1 text-[10px] rounded border shadow-xl backdrop-blur-md flex items-center
+                              ${feedback.includes("FEL") || feedback === "FEL" ? 'bg-red-900/90 border-red-500 text-red-100' : 'bg-green-900/90 border-green-500 text-green-100'}
+                          `}>
+                              {feedback}
+                          </span>
+                      )}
+                  </div>
+
+                  <div className="relative w-36 h-48 border-x-8 border-t-8 border-gray-700 rounded-t-full bg-black/60 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] flex items-end justify-center shrink-0">
+                      <div className="absolute bottom-0 w-full h-4 bg-gradient-to-t from-blue-900/40 to-transparent"></div>
+                       <div className="absolute bottom-4 z-10"> 
+                          <AnimatePresence mode='popLayout'>
+                              {currentVisitor && (
+                                  <motion.div
+                                      key={currentVisitor.id}
+                                      initial={{ x: 150, opacity: 0, scale: 0.8 }}
+                                      animate={{ x: 0, opacity: 1, scale: 1 }}
+                                      exit={{ x: -150, opacity: 0, scale: 0.8 }}
+                                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                                  >
+                                      <div className="bg-gray-800 p-2 rounded-xl border-2 border-gray-500 shadow-2xl w-24 h-32 flex flex-col items-center justify-center gap-2">
+                                          {getIcon(currentVisitor.type)}
+                                          <div className="font-arcade text-gray-400 text-[8px] uppercase tracking-widest mt-1 border-t border-gray-600 pt-1 w-full text-center">
+                                              {currentVisitor.type}
+                                          </div>
+                                      </div>
+                                  </motion.div>
+                              )}
+                          </AnimatePresence>
+                      </div>
+                  </div>
+             </div>
+
+             <div className="w-full bg-gray-800 p-3 border-t-4 border-gray-900 shrink-0 z-20">
+                 <div className="flex justify-center gap-4 max-w-sm mx-auto">
+                      <button 
+                              onClick={() => handleDecision(false)}
+                              className="flex-1 bg-red-700 hover:bg-red-600 text-white font-arcade py-3 rounded-lg border-b-4 border-red-900 active:border-b-0 active:translate-y-1 transition-all flex flex-col items-center justify-center gap-1 h-16"
+                          >
+                              <XCircle size={20} />
+                              <span className="text-[10px]">AVVISA</span>
+                      </button>
+                      <button 
+                              onClick={() => handleDecision(true)}
+                              className="flex-1 bg-green-700 hover:bg-green-600 text-white font-arcade py-3 rounded-lg border-b-4 border-green-900 active:border-b-0 active:translate-y-1 transition-all flex flex-col items-center justify-center gap-1 h-16"
+                          >
+                              <CheckCircle size={20} />
+                              <span className="text-[10px]">SLÄPP IN</span>
+                      </button>
+                 </div>
+             </div>
+          </div>
+        );
+      };
+
+      // --- MARKETING PAGE ---
+      const MarketingPage = () => {
+        return (
+          <div className="h-full bg-xlent-dark overflow-y-auto custom-scrollbar">
+            <div className="max-w-3xl mx-auto p-6 md:p-12 text-white">
+              
+              <div className="mb-12 text-center">
+                  <h1 className="text-3xl md:text-4xl font-bold mb-4 text-xlent-accent font-arcade leading-tight">
+                      {MARKETING_DATA.title}
+                  </h1>
+                  <p className="text-lg md:text-xl text-gray-300 italic">
+                      {MARKETING_DATA.subtitle}
+                  </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 mb-12">
+                  <div className="bg-white/10 p-6 rounded-xl border border-white/20 backdrop-blur-sm">
+                      <h3 className="text-xl font-bold mb-4 text-red-300 uppercase tracking-wider">Utmaningen Idag</h3>
+                      <ul className="space-y-3">
+                          {MARKETING_DATA.challenges.map((c, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                  <span className="text-red-400 mt-1">•</span>
+                                  <span className="text-gray-200 text-sm leading-relaxed">{c}</span>
+                              </li>
+                          ))}
+                      </ul>
+                  </div>
+
+                   <div className="bg-white/10 p-6 rounded-xl border border-white/20 backdrop-blur-sm">
+                      <h3 className="text-xl font-bold mb-4 text-green-300 uppercase tracking-wider">Så Hjälper Vi Er</h3>
+                      <ul className="space-y-3">
+                          {MARKETING_DATA.solution.map((c, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                  <span className="text-green-400 mt-1">•</span>
+                                  <span className="text-gray-200 text-sm leading-relaxed">{c}</span>
+                              </li>
+                          ))}
+                      </ul>
+                  </div>
+              </div>
+
+              <div className="bg-xlent-green/20 p-8 rounded-xl border border-xlent-green mb-12">
+                   <h3 className="text-xl font-bold mb-6 text-xlent-accent uppercase tracking-wider text-center">Ni Får</h3>
+                   <div className="grid md:grid-cols-3 gap-6">
+                      {MARKETING_DATA.benefits.map((b, i) => (
+                          <div key={i} className="text-center">
+                              <div className="w-12 h-12 bg-xlent-green rounded-full flex items-center justify-center mx-auto mb-3 text-xl font-bold text-white shadow-lg">
+                                  {i + 1}
+                              </div>
+                              <p className="text-sm text-gray-100">{b}</p>
+                          </div>
+                      ))}
+                   </div>
+              </div>
+
+              <div className="text-center p-8 bg-black/40 rounded-xl">
+                  <h3 className="text-2xl font-bold text-white mb-4">Kontakt</h3>
+                  <p className="mb-6 text-gray-300">Vill du diskutera detta vidare? Kontakta XLENT i valfri kanal eller klicka på knappen nedan.</p>
+                  
+                  <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-8">
+                      <Button 
+                          variant="primary" 
+                          onClick={() => window.location.href = "mailto:gustav.wendefors@xlent.se?subject=Utbildning%20inom%20Prompt%20Engineering"}
+                      >
+                          JAG VILL VETA MER
+                      </Button>
+                      <Button variant="arcade" onClick={() => window.location.reload()}>SPELA IGEN</Button>
+                  </div>
+              </div>
+
+            </div>
+          </div>
+        );
+      };
+
+      // --- MAIN APP COMPONENT ---
+      const App = () => {
+        const [phase, setPhase] = useState('intro');
+        const [showOverlay, setShowOverlay] = useState(false);
+        const [overlayTitle, setOverlayTitle] = useState("");
+        const [overlayMessage, setOverlayMessage] = useState("");
+        const [retryCount, setRetryCount] = useState(0);
+
+        const nextPhase = (next) => {
+          setShowOverlay(false);
+          setPhase(next);
+          setRetryCount(0);
+        };
+
+        const triggerConfetti = () => {
+          try {
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 }
+            });
+          } catch (e) {
+            console.error("Confetti failed", e);
+          }
+        };
+
+        const handleLevelComplete = (success) => {
+          if (phase.startsWith('bad')) {
+              if (phase === 'bad-role') nextPhase('bad-task');
+              if (phase === 'bad-task') nextPhase('bad-context');
+              if (phase === 'bad-context') nextPhase('fail-summary');
+          } else if (phase.startsWith('good')) {
+              if (success) {
+                  triggerConfetti();
+                  if (phase === 'good-role') {
+                      setOverlayTitle("Roll Klarad!");
+                      setOverlayMessage("Genom att definiera ROLLEN visste du vilka verktyg du behövde.");
+                      setShowOverlay(true);
+                      setTimeout(() => nextPhase('good-task'), 3000);
+                  }
+                  if (phase === 'good-task') {
+                      setOverlayTitle("Uppdrag Klarat!");
+                      setOverlayMessage("Med ett tydligt UPPDRAG visste du vart du skulle.");
+                      setShowOverlay(true);
+                      setTimeout(() => nextPhase('good-context'), 3000);
+                  }
+                  if (phase === 'good-context') {
+                       setOverlayTitle("Kontext Klarad!");
+                       setOverlayMessage("Rätt KONTEXT gav rätt tonläge.");
+                       setShowOverlay(true);
+                       setTimeout(() => nextPhase('victory'), 3000);
+                  }
+              } else {
+                  alert("Tiden tog slut eller du gjorde fel! Försök igen. Läs instruktionen noga.");
+                  setRetryCount(c => c + 1); 
+              }
+          }
+        };
+
+        const renderContent = () => {
+          if (showOverlay) {
+              return (
+                  <div className="h-full flex flex-col items-center justify-center bg-black bg-opacity-90 text-center p-8 animate-pulse z-50 absolute inset-0">
+                      <h2 className="text-xlent-accent font-arcade text-2xl mb-4">{overlayTitle}</h2>
+                      <p className="text-white font-sans text-lg">{overlayMessage}</p>
+                  </div>
+              );
+          }
+
+          switch (phase) {
+            case 'intro':
+              return (
+                <div className="h-full flex flex-col items-center justify-center bg-gray-900 p-8 text-center bg-[url('https://picsum.photos/seed/tech/800/600')] bg-cover bg-blend-overlay">
+                  <h1 className="text-4xl font-arcade text-xlent-accent mb-2 drop-shadow-md">PROMPT MASTER</h1>
+                  <p className="text-gray-300 mb-8 max-w-md font-sans">
+                    Hur kan du hantera uppgifter med tveksamma instruktioner? Testa dina färdigheter i tre minispel.
+                  </p>
+                  <Button variant="arcade" size="lg" onClick={() => nextPhase('bad-intro')}>STARTA SPEL</Button>
+                </div>
+              );
+
+            case 'bad-intro':
+                return (
+                  <div className="h-full flex flex-col items-center justify-center bg-red-900/20 p-8 text-center">
+                      <AlertTriangle size={64} className="text-red-500 mb-4 mx-auto" />
+                      <h2 className="text-2xl font-arcade text-white mb-4">OMGÅNG 1: BRISTFÄLLIGHET</h2>
+                      <p className="text-gray-300 mb-8">Dina instruktioner kommer vara bristfälliga. Lycka till.</p>
+                      <Button variant="danger" onClick={() => nextPhase('bad-role')}>GÅ VIDARE</Button>
+                  </div>
+                );
+
+            case 'bad-role':
+              return <RoleGame key="bad-role" isHardMode={true} onComplete={handleLevelComplete} />;
+            case 'bad-task':
+              return <TaskGame key="bad-task" isHardMode={true} onComplete={handleLevelComplete} />;
+            case 'bad-context':
+              return <ContextGame key="bad-context" isHardMode={true} onComplete={handleLevelComplete} />;
+
+            case 'fail-summary':
+              return (
+                <div className="h-full flex flex-col items-center justify-center bg-gray-800 p-8 text-center">
+                  <h2 className="text-2xl font-arcade text-red-500 mb-4">GAME OVER?</h2>
+                  <p className="text-white mb-6 font-sans">
+                    Det var svårt, eller hur? <br/><br/>
+                    Utan <strong>roll</strong>, <strong>uppdrag</strong> och <strong>kontext</strong> blir arbetet mer av en gissningslek.
+                  </p>
+                  <Button variant="primary" onClick={() => nextPhase('education')}>LÄR DIG HACKET</Button>
+                </div>
+              );
+
+            case 'education':
+              return (
+                <div className="h-full flex flex-col items-center justify-center bg-xlent-dark p-8 text-center">
+                  <h2 className="text-xl font-bold text-xlent-accent mb-6 font-arcade">PROMPT ENGINEERING 101</h2>
+                  <div className="space-y-4 text-left w-full max-w-md mb-8">
+                      <div className="bg-white/10 p-4 rounded border-l-4 border-blue-500">
+                          <strong className="text-blue-300 block mb-1">1. ROLL</strong>
+                          <span className="text-sm text-gray-200">Vem ska AI:n vara? (Analytiker, kock, kommunikatör)</span>
+                      </div>
+                      <div className="bg-white/10 p-4 rounded border-l-4 border-green-500">
+                          <strong className="text-green-300 block mb-1">2. UPPDRAG</strong>
+                          <span className="text-sm text-gray-200">Vad exakt vill du få utfört? (Analysera texten, felsök koden)</span>
+                      </div>
+                      <div className="bg-white/10 p-4 rounded border-l-4 border-yellow-500">
+                          <strong className="text-yellow-300 block mb-1">3. KONTEXT</strong>
+                          <span className="text-sm text-gray-200">Vilket är sammanhanget?</span>
+                      </div>
+                  </div>
+                  <Button variant="success" onClick={() => nextPhase('good-intro')}>TESTA IGEN (MED RÄTT FÖRUTSÄTTNINGAR)</Button>
+                </div>
+              );
+
+            case 'good-intro':
+                return (
+                  <div className="h-full flex flex-col items-center justify-center bg-green-900/20 p-8 text-center">
+                      <Brain size={64} className="text-green-500 mb-4 mx-auto" />
+                      <h2 className="text-xl md:text-2xl font-arcade text-white mb-4 leading-relaxed">OMGÅNG 2:<br/>ROLL, UPPDRAG OCH KONTEXT</h2>
+                      <p className="text-gray-300 mb-8 max-w-md">
+                         Nu får du se hur mycket enklare det blir när du har rätt förutsättningar och tydliga instruktioner.
+                      </p>
+                      <Button variant="success" onClick={() => nextPhase('good-role')}>STARTA OMGÅNG 2</Button>
+                  </div>
+                );
+
+            case 'good-role':
+              return <RoleGame key={`good-role-${retryCount}`} isHardMode={false} onComplete={handleLevelComplete} />;
+            case 'good-task':
+              return <TaskGame key={`good-task-${retryCount}`} isHardMode={false} onComplete={handleLevelComplete} />;
+            case 'good-context':
+              return <ContextGame key={`good-context-${retryCount}`} isHardMode={false} onComplete={handleLevelComplete} />;
+
+            case 'victory':
+               return (
+                  <div className="h-full flex flex-col items-center justify-center bg-green-900/30 p-8 text-center">
+                      <CheckCircle size={80} className="text-green-500 mb-6 mx-auto animate-bounce" />
+                      <h1 className="text-3xl font-arcade text-xlent-accent mb-4">GRATTIS!</h1>
+                      <p className="text-white mb-8 text-lg">Du har bemästrat grunderna i Prompt Engineering.</p>
+                      <Button variant="arcade" size="lg" onClick={() => nextPhase('marketing')}>NÄSTA STEG</Button>
+                  </div>
+               );
+
+            case 'marketing':
+              return <MarketingPage />;
+
+            default:
+              return <div>Error</div>;
+          }
+        };
+
+        return (
+          <ArcadeCabinet title="XLENT PROMPT ACADEMY">
+            {renderContent()}
+          </ArcadeCabinet>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      );
+    </script>
   </body>
 </html>
