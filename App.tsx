@@ -6,7 +6,7 @@ import { RoleGame } from './components/games/RoleGame';
 import { TaskGame } from './components/games/TaskGame';
 import { ContextGame } from './components/games/ContextGame';
 import { MarketingPage } from './components/MarketingPage';
-import { Zap, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Zap, AlertTriangle, CheckCircle, Brain } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const App: React.FC = () => {
@@ -135,9 +135,21 @@ const App: React.FC = () => {
                     <span className="text-sm text-gray-200">Vilket är sammanhanget?</span>
                 </div>
             </div>
-            <Button variant="success" onClick={() => nextPhase('good-role')}>TESTA IGEN (MED RÄTT FÖRUTSÄTTNINGAR)</Button>
+            <Button variant="success" onClick={() => nextPhase('good-intro')}>TESTA IGEN (MED RÄTT FÖRUTSÄTTNINGAR)</Button>
           </div>
         );
+
+      case 'good-intro':
+          return (
+            <div className="h-full flex flex-col items-center justify-center bg-green-900/20 p-8 text-center">
+                <Brain size={64} className="text-green-500 mb-4 mx-auto" />
+                <h2 className="text-xl md:text-2xl font-arcade text-white mb-4 leading-relaxed">OMGÅNG 2:<br/>ROLL, UPPDRAG OCH KONTEXT</h2>
+                <p className="text-gray-300 mb-8 max-w-md">
+                   Nu får du se hur mycket enklare det blir när du har rätt förutsättningar och tydliga instruktioner.
+                </p>
+                <Button variant="success" onClick={() => nextPhase('good-role')}>STARTA OMGÅNG 2</Button>
+            </div>
+          );
 
       case 'good-role':
         return <RoleGame key={`good-role-${retryCount}`} isHardMode={false} onComplete={handleLevelComplete} />;
