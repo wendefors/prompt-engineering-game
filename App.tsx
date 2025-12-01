@@ -23,11 +23,15 @@ const App: React.FC = () => {
   };
 
   const triggerConfetti = () => {
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
+    try {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    } catch (e) {
+      console.error("Confetti failed", e);
+    }
   };
 
   const handleLevelComplete = (success: boolean) => {
