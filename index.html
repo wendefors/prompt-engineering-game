@@ -82,7 +82,7 @@
 
     <script type="text/babel" data-type="module">
       import React, { useState, useEffect } from 'https://esm.sh/react@18.2.0';
-      import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
+      import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
       import { 
         Shield, Hammer, Utensils, Pizza, Carrot, Smartphone, Wrench, ChefHat,
         ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Flag, Skull,
@@ -363,7 +363,6 @@
           }
 
           setPlayerPos({ x: newX, y: newY });
-          setMoves(m => m + 1);
 
           const coordKey = `${newX},${newY}`;
           const isSafe = safePathStr.has(coordKey);
@@ -397,11 +396,16 @@
               }
           }
 
-          if (moves + 1 >= maxMoves) {
-            setGameOver(true);
-            setLog(prev => [...prev, isHardMode ? "Systemfel. Försök avbryts." : "Slut på energi."]);
-            setTimeout(() => onComplete(false), 1500);
-          }
+          // Uppdatera moves på ett säkert sätt och hantera game over här
+          setMoves(prev => {
+            const next = prev + 1;
+            if (!gameOver && next >= maxMoves) {
+              setGameOver(true);
+              setLog(prevLog => [...prevLog, isHardMode ? "Systemfel. Försök avbryts." : "Slut på energi."]);
+              setTimeout(() => onComplete(false), 1500);
+            }
+            return next;
+          });
         };
 
         return (
@@ -419,7 +423,7 @@
               )}
             </div>
 
-            {/* GRID CONTAINER FIX: Added max-h-full and aspect ratio on grid to prevent cutoff */}
+            {/* GRID CONTAINER */}
             <div className="flex-1 flex justify-center items-center overflow-hidden min-h-0 w-full">
               <div 
                   className="grid gap-0.5 bg-gray-800 p-1 rounded border-4 border-gray-700 shadow-2xl"
@@ -447,7 +451,7 @@
                   return (
                     <div key={i} className="bg-gray-700/50 rounded-[2px] flex items-center justify-center relative border border-gray-600/20">
                       {goalAtPos && (
-                          <Flag className={`${goalAtPos.color} drop-shadow-md`} size={isHardMode ? 20 : 20} fill="currentColor" />
+                          <Flag className={`${goalAtPos.color} drop-shadow-md`} size={20} fill="currentColor" />
                       )}
                       
                       {showTrap && <Skull className="text-red-500 opacity-80" size={18} />}
@@ -546,6 +550,7 @@
                 case 'robot': return <Bot size={40} className="text-blue-400" />;
                 case 'human': return <User size={40} className="text-yellow-400" />;
                 case 'alien': return <Ghost size={40} className="text-green-400" />;
+                default: return null;
             }
         };
 
@@ -881,12 +886,21 @@
           }
         };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(
-          <React.StrictMode>
-            <App />
-          </React.StrictMode>
+        return (
+          <ArcadeCabinet title="Prompt Master: The XLENT Game">
+            {renderContent()}
+          </ArcadeCabinet>
         );
-      </script>
+      };
+
+      // --- MOUNT REACT APP ---
+      const rootElement = document.getElementById('root');
+      const root = createRoot(rootElement);
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      );
+    </script>
   </body>
 </html>
