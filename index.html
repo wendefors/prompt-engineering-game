@@ -12,7 +12,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@700&family=Press+Start+2P&display=swap" rel="stylesheet">
     
     <script>
       tailwind.config = {
@@ -20,6 +20,7 @@
           extend: {
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'monospace'],
               arcade: ['"Press Start 2P"', 'cursive'],
             },
             colors: {
@@ -42,6 +43,7 @@
         background-color: #1a1a1a;
         color: #f3f4f6;
         overflow-x: hidden;
+        touch-action: manipulation;
       }
       .custom-scrollbar::-webkit-scrollbar {
         width: 8px;
@@ -56,18 +58,33 @@
       .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: #5d8a7a; 
       }
+      
+      /* Simple CSS transition for cards instead of Framer Motion */
+      .visitor-card {
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        transform: scale(0.8) translateY(20px);
+        opacity: 0;
+      }
+      .visitor-card.active {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .visitor-card.exit {
+        transform: scale(0.8) translateX(-100px);
+        opacity: 0;
+      }
     </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
-    "vite": "https://aistudiocdn.com/vite@^7.2.6",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
     "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.25",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
-    "canvas-confetti": "https://aistudiocdn.com/canvas-confetti@^1.9.4"
+    "canvas-confetti": "https://aistudiocdn.com/canvas-confetti@^1.9.4",
+    "vite": "https://aistudiocdn.com/vite@^7.2.6",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
   }
 }
 </script>
@@ -84,7 +101,6 @@
         Ghost, Bot, User, XCircle, CheckCircle,
         Zap, AlertTriangle, Brain 
       } from 'https://esm.sh/lucide-react@0.344.0';
-      import { motion, AnimatePresence } from 'https://esm.sh/framer-motion@11.0.8';
       import confetti from 'https://esm.sh/canvas-confetti@1.9.2';
 
       // --- CONSTANTS ---
@@ -117,7 +133,7 @@
         className = '', 
         ...props 
       }) => {
-        const baseStyles = "font-arcade uppercase transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
+        const baseStyles = "font-arcade uppercase transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed select-none";
         
         const variants = {
           primary: "bg-xlent-green text-white border-b-4 border-xlent-dark hover:bg-opacity-90",
@@ -145,7 +161,7 @@
       // --- COMPONENT: ARCADE CABINET ---
       const ArcadeCabinet = ({ children, title }) => {
         return (
-          <div className="min-h-screen bg-gray-900 flex items-center justify-center p-2 font-sans">
+          <div className="min-h-screen bg-gray-900 flex items-center justify-center p-2 font-sans select-none">
             <div className="w-full max-w-4xl bg-gray-800 rounded-3xl p-4 shadow-2xl border-4 border-gray-700 flex flex-col h-[90vh] md:h-[800px]">
               
               {/* Header */}
@@ -257,12 +273,12 @@
             <div className="bg-slate-900 p-4 border-b-4 border-slate-700 flex justify-between items-start z-20 shrink-0 gap-4">
                <div className="flex flex-col flex-1 min-w-0 justify-center min-h-[3.5rem]">
                    {isHardMode ? (
-                       <div className="font-arcade text-sm md:text-base text-red-400 animate-pulse leading-tight">
+                       <div className="font-mono font-bold text-sm md:text-base text-red-400 animate-pulse leading-tight">
                           <div>PROMPT: SAMLA DET DU</div>
                           <div>BEHÖVER FÖR ATT LÖSA UPPGIFTEN</div>
                        </div>
                    ) : (
-                       <div className="font-arcade text-sm md:text-base text-yellow-400 leading-tight">
+                       <div className="font-mono font-bold text-sm md:text-base text-yellow-400 leading-tight">
                           <div className="mb-1 text-green-400">ROLL: KOCK</div>
                           <div>PROMPT: SAMLA DET DU</div>
                           <div>BEHÖVER FÖR ATT LÖSA UPPGIFTEN</div>
@@ -311,10 +327,6 @@
                       </div>
                     </button>
                 ))}
-                
-                <div className="absolute bottom-10 w-full text-center pointer-events-none opacity-40">
-                   <p className="font-arcade text-white text-xs">KLICKA PÅ OBJEKTEN</p>
-                </div>
             </div>
           </div>
         );
@@ -345,7 +357,8 @@
             "2,0", "3,0", "4,0", "5,0", "6,0", "7,0"
         ]);
 
-        const maxMoves = 40;
+        // In hard mode, we fail faster to prevent getting stuck
+        const maxMoves = isHardMode ? 15 : 40;
 
         useEffect(() => {
             setLog([isHardMode ? "System: Väntar på input..." : "System: Ruttinläsning klar."]);
@@ -399,22 +412,22 @@
 
           if (moves + 1 >= maxMoves) {
             setGameOver(true);
-            setLog(prev => [...prev, "Slut på energi."]);
+            setLog(prev => [...prev, isHardMode ? "Systemfel. Försök avbryts." : "Slut på energi."]);
             setTimeout(() => onComplete(false), 1500);
           }
         };
 
         return (
           <div className="h-full w-full flex flex-col bg-gray-900 p-2 md:p-4">
-            <div className="bg-black p-3 border border-gray-700 mb-2 font-arcade text-xs text-center shadow-lg shrink-0">
+            <div className="bg-black p-3 border border-gray-700 mb-2 font-mono text-xs text-center shadow-lg shrink-0">
               {isHardMode ? (
                 <div className="flex flex-col gap-1">
-                    <span className="text-xlent-accent animate-pulse">PROMPT: "TA DIG TILL MÅLET."</span>
+                    <span className="text-xlent-accent font-bold animate-pulse">PROMPT: "TA DIG TILL MÅLET."</span>
                     <span className="text-[10px] text-gray-500">(Vilket mål är rätt? Var finns minorna?)</span>
                 </div>
               ) : (
                 <div className="flex flex-col gap-1">
-                     <span className="text-green-400">UPPDRAG: GÅ TILL GRÖN FLAGGA. UNDVIK MINOR.</span>
+                     <span className="text-green-400 font-bold">UPPDRAG: GÅ TILL GRÖN FLAGGA. UNDVIK MINOR.</span>
                 </div>
               )}
             </div>
@@ -460,7 +473,7 @@
               </div>
             </div>
 
-            <div className="mt-2 flex flex-col items-center gap-2 shrink-0">
+            <div className="mt-2 flex flex-col items-center gap-2 shrink-0 z-20">
               <div className="grid grid-cols-3 gap-2">
                   <div />
                   <Button variant="arcade" size="sm" onClick={() => move(0, -1)} disabled={gameOver} className="w-12 h-12 flex items-center justify-center"><ArrowUp /></Button>
@@ -516,10 +529,18 @@
 
             if (isCorrectAccordingToRule) {
                 points = 10;
-                msg = "RÄTT";
+                if (isHardMode) {
+                    msg = "RÄTT";
+                } else {
+                    msg = "RÄTT!";
+                }
             } else {
                 points = -10;
-                msg = isHardMode ? "FEL" : "FEL! Endast robotar idag!";
+                if (isHardMode) {
+                    msg = "FEL";
+                } else {
+                    msg = "FEL! Endast robotar idag!";
+                }
             }
 
             setScore(s => s + points);
@@ -543,7 +564,7 @@
              <div className="w-full bg-black border-b-4 border-gray-700 p-3 text-center z-10 shrink-0 shadow-lg">
                   {isHardMode ? (
                       <>
-                          <h2 className="text-xlent-accent font-arcade text-xs leading-relaxed mb-1">
+                          <h2 className="text-xlent-accent font-mono font-bold text-xs leading-relaxed mb-1">
                               PROMPT: "DU ÄR DÖRRVAKT PÅ EN KLUBB, AVGÖR VILKA GÄSTER SOM SKA SLÄPPAS IN."
                           </h2>
                           <p className="text-red-400 text-[10px] font-mono animate-pulse">
@@ -552,7 +573,7 @@
                       </>
                   ) : (
                       <>
-                          <h2 className="text-xlent-accent font-arcade text-xs leading-relaxed mb-1">
+                          <h2 className="text-xlent-accent font-mono font-bold text-xs leading-relaxed mb-1">
                              PROMPT: "DU ÄR DÖRRVAKT PÅ EN KLUBB, AVGÖR VILKA GÄSTER SOM SKA SLÄPPAS IN."
                           </h2>
                           <p className="text-green-400 text-[10px] font-mono">
@@ -571,7 +592,7 @@
                       {feedback && (
                           <span className={`
                               font-arcade px-2 py-1 text-[10px] rounded border shadow-xl backdrop-blur-md flex items-center
-                              ${feedback.includes("FEL") || feedback === "FEL" ? 'bg-red-900/90 border-red-500 text-red-100' : 'bg-green-900/90 border-green-500 text-green-100'}
+                              ${feedback.includes("Fel") || feedback === "FEL" ? 'bg-red-900/90 border-red-500 text-red-100' : 'bg-green-900/90 border-green-500 text-green-100'}
                           `}>
                               {feedback}
                           </span>
@@ -580,25 +601,18 @@
 
                   <div className="relative w-36 h-48 border-x-8 border-t-8 border-gray-700 rounded-t-full bg-black/60 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] flex items-end justify-center shrink-0">
                       <div className="absolute bottom-0 w-full h-4 bg-gradient-to-t from-blue-900/40 to-transparent"></div>
-                       <div className="absolute bottom-4 z-10"> 
-                          <AnimatePresence mode='popLayout'>
-                              {currentVisitor && (
-                                  <motion.div
-                                      key={currentVisitor.id}
-                                      initial={{ x: 150, opacity: 0, scale: 0.8 }}
-                                      animate={{ x: 0, opacity: 1, scale: 1 }}
-                                      exit={{ x: -150, opacity: 0, scale: 0.8 }}
-                                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                  >
-                                      <div className="bg-gray-800 p-2 rounded-xl border-2 border-gray-500 shadow-2xl w-24 h-32 flex flex-col items-center justify-center gap-2">
-                                          {getIcon(currentVisitor.type)}
-                                          <div className="font-arcade text-gray-400 text-[8px] uppercase tracking-widest mt-1 border-t border-gray-600 pt-1 w-full text-center">
-                                              {currentVisitor.type}
-                                          </div>
-                                      </div>
-                                  </motion.div>
-                              )}
-                          </AnimatePresence>
+                       <div className="absolute bottom-4 z-10 w-full flex justify-center"> 
+                          {/* CSS Only Transition instead of Framer Motion to prevent crashes */}
+                          <div className={`visitor-card ${currentVisitor ? 'active' : 'exit'}`}>
+                             {currentVisitor && (
+                                <div className="bg-gray-800 p-2 rounded-xl border-2 border-gray-500 shadow-2xl w-24 h-32 flex flex-col items-center justify-center gap-2">
+                                    {getIcon(currentVisitor.type)}
+                                    <div className="font-arcade text-gray-400 text-[8px] uppercase tracking-widest mt-1 border-t border-gray-600 pt-1 w-full text-center">
+                                        {currentVisitor.type}
+                                    </div>
+                                </div>
+                             )}
+                          </div>
                       </div>
                   </div>
              </div>
@@ -631,6 +645,7 @@
           <div className="h-full bg-xlent-dark overflow-y-auto custom-scrollbar">
             <div className="max-w-3xl mx-auto p-6 md:p-12 text-white">
               
+              {/* Header */}
               <div className="mb-12 text-center">
                   <h1 className="text-3xl md:text-4xl font-bold mb-4 text-xlent-accent font-arcade leading-tight">
                       {MARKETING_DATA.title}
@@ -640,7 +655,9 @@
                   </p>
               </div>
 
+              {/* Grid Content */}
               <div className="grid md:grid-cols-2 gap-8 mb-12">
+                  {/* Column 1: Utmaningen */}
                   <div className="bg-white/10 p-6 rounded-xl border border-white/20 backdrop-blur-sm">
                       <h3 className="text-xl font-bold mb-4 text-red-300 uppercase tracking-wider">Utmaningen Idag</h3>
                       <ul className="space-y-3">
@@ -653,6 +670,7 @@
                       </ul>
                   </div>
 
+                   {/* Column 2: Lösningen */}
                    <div className="bg-white/10 p-6 rounded-xl border border-white/20 backdrop-blur-sm">
                       <h3 className="text-xl font-bold mb-4 text-green-300 uppercase tracking-wider">Så Hjälper Vi Er</h3>
                       <ul className="space-y-3">
@@ -666,6 +684,7 @@
                   </div>
               </div>
 
+              {/* Benefits Section */}
               <div className="bg-xlent-green/20 p-8 rounded-xl border border-xlent-green mb-12">
                    <h3 className="text-xl font-bold mb-6 text-xlent-accent uppercase tracking-wider text-center">Ni Får</h3>
                    <div className="grid md:grid-cols-3 gap-6">
@@ -680,6 +699,7 @@
                    </div>
               </div>
 
+              {/* CTA */}
               <div className="text-center p-8 bg-black/40 rounded-xl">
                   <h3 className="text-2xl font-bold text-white mb-4">Kontakt</h3>
                   <p className="mb-6 text-gray-300">Vill du diskutera detta vidare? Kontakta XLENT i valfri kanal eller klicka på knappen nedan.</p>
@@ -728,6 +748,7 @@
 
         const handleLevelComplete = (success) => {
           if (phase.startsWith('bad')) {
+              // Bad levels always lead to the next bad level or the summary
               if (phase === 'bad-role') nextPhase('bad-task');
               if (phase === 'bad-task') nextPhase('bad-context');
               if (phase === 'bad-context') nextPhase('fail-summary');
@@ -753,6 +774,7 @@
                        setTimeout(() => nextPhase('victory'), 3000);
                   }
               } else {
+                  // Failure in good mode: Force restart of the level
                   alert("Tiden tog slut eller du gjorde fel! Försök igen. Läs instruktionen noga.");
                   setRetryCount(c => c + 1); 
               }
