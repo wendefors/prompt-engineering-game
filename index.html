@@ -84,10 +84,12 @@
       import React, { useState, useEffect } from 'https://esm.sh/react@18.2.0';
       import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
       import { 
-        Shield, Hammer, Utensils, Pizza, Carrot, Smartphone, Wrench, ChefHat,
-        ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Flag, Skull,
-        Ghost, Bot, User, XCircle, CheckCircle,
-        AlertTriangle, Brain, Check, Zap, Car, Star
+        import { 
+          Shield, Hammer, Utensils, Pizza, Carrot, Smartphone, Wrench, ChefHat,
+          ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Flag, Skull,
+          Ghost, Bot, User, XCircle, CheckCircle,
+          AlertTriangle, Brain, Check, Star
+} from 'https://esm.sh/lucide-react@0.344.0';
       } from 'https://esm.sh/lucide-react@0.344.0';
       import confetti from 'https://esm.sh/canvas-confetti@1.9.2';
 
@@ -510,7 +512,7 @@
         const MAX_VISITORS = 10;
 
         useEffect(() => {
-          const types = ['robot', 'robot', 'human', 'alien', 'human'];
+          const types = ['robot', 'robot', 'human', 'alien', 'vip', 'human'];
           const newQueue = Array.from({ length: MAX_VISITORS }).map((_, i) => ({
             id: i,
             type: types[Math.floor(Math.random() * types.length)]
@@ -553,13 +555,19 @@
         };
 
         const getIcon = (type) => {
-          switch(type) {
-            case 'robot': return <Bot size={36} className="text-blue-400" />;
-            case 'human': return <User size={36} className="text-yellow-400" />;
-            case 'alien': return <Ghost size={36} className="text-green-400" />;
-            default: return null;
-          }
-        };
+  switch(type) {
+    case 'robot':
+      return <Bot size={36} className="text-blue-400" />;
+    case 'human':
+      return <User size={36} className="text-yellow-400" />;
+    case 'alien':
+      return <Ghost size={36} className="text-green-400" />;
+    case 'vip':
+      return <Star size={36} className="text-purple-400" />;
+    default:
+      return null;
+  }
+};
 
         return (
           <div className="h-full w-full flex flex-col bg-slate-900 relative overflow-hidden">
