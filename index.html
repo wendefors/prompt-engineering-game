@@ -87,7 +87,7 @@
         Shield, Hammer, Utensils, Pizza, Carrot, Smartphone, Wrench, ChefHat,
         ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Flag, Skull,
         Ghost, Bot, User, XCircle, CheckCircle,
-        AlertTriangle, Brain, Check 
+        AlertTriangle, Brain, Check, Zap, Car, Star
       } from 'https://esm.sh/lucide-react@0.344.0';
       import confetti from 'https://esm.sh/canvas-confetti@1.9.2';
 
@@ -194,11 +194,25 @@
             let type;
 
             if (isGoodItem) {
-              const goodIcons = [<Pizza key="p" size={28} />, <Carrot key="c" size={28} />, <Utensils key="u" size={28} />, <ChefHat key="ch" size={28} />];
+              const goodIcons = [
+                <Pizza key="p" size={28} />,
+                <Carrot key="c" size={28} />,
+                <Utensils key="u" size={28} />,
+                <ChefHat key="ch" size={28} />
+              ];
               icon = goodIcons[Math.floor(Math.random() * goodIcons.length)];
               type = 'good';
             } else {
-              const badIcons = [<Hammer key="h" size={28} />, <Wrench key="w" size={28} />, <Smartphone key="s" size={28} />, <Shield key="sh" size={28} />];
+              const badIcons = [
+                <Hammer key="h" size={28} />,
+                <Wrench key="w" size={28} />,
+                <Smartphone key="s" size={28} />,
+                <Shield key="sh" size={28} />,
+                <Zap key="z" size={28} />,
+                <AlertTriangle key="a" size={28} />,
+                <Car key="car" size={28} />,
+                <Star key="star" size={28} />
+              ];
               icon = badIcons[Math.floor(Math.random() * badIcons.length)];
               type = 'bad';
             }
@@ -463,11 +477,19 @@
             <div className="mt-2 flex flex-col items-center gap-2 shrink-0 z-20">
               <div className="grid grid-cols-3 gap-2">
                 <div />
-                <Button variant="arcade" size="sm" onClick={() => move(0, -1)} disabled={gameOver} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center"><ArrowUp size={16} /></Button>
+                <Button variant="arcade" size="sm" onClick={() => move(0, -1)} disabled={gameOver} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+                  <ArrowUp size={16} />
+                </Button>
                 <div />
-                <Button variant="arcade" size="sm" onClick={() => move(-1, 0)} disabled={gameOver} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center"><ArrowLeft size={16} /></Button>
-                <Button variant="arcade" size="sm" onClick={() => move(0, 1)} disabled={gameOver} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center"><ArrowDown size={16} /></Button>
-                <Button variant="arcade" size="sm" onClick={() => move(1, 0)} disabled={gameOver} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center"><ArrowRight size={16} /></Button>
+                <Button variant="arcade" size="sm" onClick={() => move(-1, 0)} disabled={gameOver} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+                  <ArrowLeft size={16} />
+                </Button>
+                <Button variant="arcade" size="sm" onClick={() => move(0, 1)} disabled={gameOver} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+                  <ArrowDown size={16} />
+                </Button>
+                <Button variant="arcade" size="sm" onClick={() => move(1, 0)} disabled={gameOver} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+                  <ArrowRight size={16} />
+                </Button>
               </div>
               
               <div className="w-full max-w-[400px] bg-black border border-green-900 p-1.5 md:p-2 font-mono text-[9px] md:text-[10px] text-green-500 max-h-16 overflow-y-auto flex flex-col justify-end">
@@ -497,7 +519,7 @@
         }, []);
 
         useEffect(() => {
-          if (processedCount >= 5) { 
+          if (processedCount >= 8) { 
             onComplete(score >= 30); 
           }
         }, [processedCount, score, onComplete]);
@@ -541,48 +563,62 @@
 
         return (
           <div className="h-full w-full flex flex-col bg-slate-900 relative overflow-hidden">
-            <div className="w-full bg-black border-b-4 border-gray-700 p-2 md:p-3 text-center z-10 shrink-0 shadow-lg">
+            <div className="w-full bg-black border-b-4 border-gray-700 p-2 md:p-3 z-10 shrink-0 shadow-lg flex flex-col items-center">
               {isHardMode ? (
                 <>
-                  <h2 className="text-xlent-accent font-mono font-bold text-[10px] md:text-xs leading-relaxed mb-1">
+                  <h2 className="text-xlent-accent font-mono font-bold text-[10px] md:text-xs leading-relaxed mb-1 text-center">
                     PROMPT: "DU ÄR DÖRRVAKT PÅ EN KLUBB, AVGÖR VILKA GÄSTER SOM SKA SLÄPPAS IN."
                   </h2>
-                  <p className="text-red-400 text-[9px] md:text-[10px] font-mono animate-pulse">
+                  <p className="text-red-400 text-[9px] md:text-[10px] font-mono animate-pulse text-center">
                     SAKNAD KONTEXT: Vem får komma in och vem ska avvisas?
                   </p>
                 </>
               ) : (
                 <>
-                  <h2 className="text-xlent-accent font-mono font-bold text-[10px] md:text-xs leading-relaxed mb-1">
+                  <h2 className="text-xlent-accent font-mono font-bold text-[10px] md:text-xs leading-relaxed mb-1 text-center">
                     PROMPT: "DU ÄR DÖRRVAKT PÅ EN KLUBB, AVGÖR VILKA GÄSTER SOM SKA SLÄPPAS IN."
                   </h2>
-                  <p className="text-green-400 text-[9px] md:text-[10px] font-mono">
+                  <p className="text-green-400 text-[9px] md:text-[10px] font-mono text-center">
                     KONTEXT: Ikväll är det exklusiv robotkväll på klubben.
                   </p>
                 </>
               )}
-            </div>
-
-            <div className="absolute top-2 right-2 md:top-3 md:right-3 text-white font-arcade text-[9px] md:text-[10px] z-20 bg-black/50 px-2 py-1 rounded">
-              SCORE: {score}
+              <div className="mt-1 text-white font-arcade text-[9px] md:text-[10px] bg-black/60 px-2 py-0.5 rounded">
+                SCORE: {score}
+              </div>
             </div>
 
             <div className="flex-1 flex flex-col items-center justify-end relative min-h-0 w-full overflow-hidden pb-3 md:pb-4">
               <div className="h-6 flex justify-center w-full z-30 pointer-events-none mb-1 md:mb-2">
                 {feedback && (
-                  <span className={`
-                    font-arcade px-2 py-1 text-[9px] md:text-[10px] rounded border shadow-xl backdrop-blur-md flex items-center
-                    ${feedback.includes("FEL") ? 'bg-red-900/90 border-red-500 text-red-100' : 'bg-green-900/90 border-green-500 text-green-100'}
-                  `}>
+                  <span
+                    className={`
+                      font-arcade px-2 py-1 text-[9px] md:text-[10px] rounded border shadow-xl backdrop-blur-md flex items-center
+                      ${feedback.includes("FEL") ? 'bg-red-900/90 border-red-500 text-red-100' : 'bg-green-900/90 border-green-500 text-green-100'}
+                    `}
+                  >
                     {feedback}
                   </span>
                 )}
               </div>
 
+              {/* Neon-skylt ovanför dörren */}
+              <div className="mb-2 flex flex-col items-center">
+                <div className="px-3 py-1 rounded-full border-2 border-xlent-accent bg-black/40 shadow-[0_0_12px_rgba(244,211,94,0.8)]">
+                  <span className="font-arcade text-[9px] md:text-[10px] text-xlent-accent tracking-[0.2em]">
+                    CLUB XLENT
+                  </span>
+                </div>
+                {!isHardMode && (
+                  <div className="mt-1 text-[8px] md:text-[9px] text-blue-300 font-arcade tracking-[0.15em] uppercase">
+                    Robot Night
+                  </div>
+                )}
+              </div>
+
               <div className="relative w-32 h-40 md:w-36 md:h-48 border-x-8 border-t-8 border-gray-700 rounded-t-full bg-black/60 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] flex items-end justify-center shrink-0">
                 <div className="absolute bottom-0 w-full h-4 bg-gradient-to-t from-blue-900/40 to-transparent"></div>
-                <div className="absolute bottom-3 md:bottom-4 z-10 w-full flex justify-center"> 
-                  {/* Pure CSS Transition */}
+                <div className="absolute bottom-3 md:bottom-4 z-10 w-full flex justify-center">
                   <div className={`visitor-card ${currentVisitor ? 'active' : 'exit'}`}>
                     {currentVisitor && (
                       <div className="bg-gray-800 p-2 rounded-xl border-2 border-gray-500 shadow-2xl w-20 h-28 md:w-24 md:h-32 flex flex-col items-center justify-center gap-2">
@@ -603,7 +639,7 @@
                   onClick={() => handleDecision(false)}
                   className="flex-1 bg-red-700 hover:bg-red-600 text-white font-arcade py-2 md:py-3 rounded-lg border-b-4 border-red-900 active:border-b-0 active:translate-y-1 transition-all flex flex-col items-center justify-center gap-1 h-12 md:h-16 text-[9px] md:text-[10px]"
                 >
-                  <XCircle size={18} className="md:size-20" />
+                  <XCircle size={18} />
                   <span>AVVISA</span>
                 </button>
                 <button 
@@ -688,7 +724,7 @@
                 
                 <div className="flex flex-col md:flex-row gap-3 md:gap-4 justify-center items-center mt-4 md:mt-8">
                   <Button 
-                    variant="primary" 
+                    variant="arcade" 
                     onClick={() => window.location.href = "mailto:gustav.wendefors@xlent.se?subject=Utbildning%20inom%20Prompt%20Engineering"}
                   >
                     JAG VILL VETA MER
@@ -756,9 +792,10 @@
                 setTimeout(() => nextPhase('victory'), 3000);
               }
             } else {
-              // Failure in good mode: Force restart of the level
-              alert("Tiden tog slut eller du gjorde fel! Försök igen. Läs instruktionen noga.");
-              setRetryCount(c => c + 1); 
+              // Endast ett försök i omgång 2: gå vidare utan omstart
+              if (phase === 'good-role') nextPhase('good-task');
+              if (phase === 'good-task') nextPhase('good-context');
+              if (phase === 'good-context') nextPhase('victory');
             }
           }
         };
@@ -788,7 +825,7 @@
             case 'bad-intro':
               return (
                 <div className="h-full flex flex-col items-center justify-center bg-red-900/20 p-4 md:p-8 text-center">
-                  <AlertTriangle size={48} className="md:size-16 text-red-500 mb-3 md:mb-4 mx-auto" />
+                  <AlertTriangle size={48} className="text-red-500 mb-3 md:mb-4 mx-auto" />
                   <h2 className="text-lg md:text-2xl font-arcade text-white mb-3 md:mb-4">OMGÅNG 1: BRISTFÄLLIGHET</h2>
                   <p className="text-gray-300 mb-6 md:mb-8 text-sm md:text-base max-w-xs md:max-w-md">
                     Dina instruktioner kommer vara bristfälliga. Lycka till.
@@ -841,7 +878,7 @@
             case 'good-intro':
               return (
                 <div className="h-full flex flex-col items-center justify-center bg-green-900/20 p-4 md:p-8 text-center">
-                  <Brain size={48} className="md:size-16 text-green-500 mb-3 md:mb-4 mx-auto" />
+                  <Brain size={48} className="text-green-500 mb-3 md:mb-4 mx-auto" />
                   <h2 className="text-lg md:text-2xl font-arcade text-white mb-3 md:mb-4 leading-relaxed">
                     OMGÅNG 2:<br className="hidden md:block" />ROLL, UPPDRAG OCH KONTEXT
                   </h2>
@@ -862,7 +899,7 @@
             case 'victory':
               return (
                 <div className="h-full flex flex-col items-center justify-center bg-green-900/30 p-4 md:p-8 text-center">
-                  <CheckCircle size={56} className="md:size-20 text-green-500 mb-4 md:mb-6 mx-auto animate-bounce" />
+                  <CheckCircle size={64} className="text-green-500 mb-4 md:mb-6 mx-auto animate-bounce" />
                   <h1 className="text-2xl md:text-3xl font-arcade text-xlent-accent mb-3 md:mb-4">GRATTIS!</h1>
                   <p className="text-white mb-6 md:mb-8 text-sm md:text-lg max-w-xs md:max-w-md">
                     Du har bemästrat grunderna i Prompt Engineering.
@@ -875,7 +912,11 @@
               return <MarketingPage />;
 
             default:
-              return <div className="text-white p-4">Error</div>;
+              return (
+                <div className="h-full flex items-center justify-center text-white">
+                  Något gick fel. Starta om spelet.
+                </div>
+              );
           }
         };
 
@@ -886,7 +927,6 @@
         );
       };
 
-      // --- MOUNT REACT APP ---
       const rootElement = document.getElementById('root');
       const root = createRoot(rootElement);
       root.render(
