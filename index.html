@@ -84,12 +84,10 @@
       import React, { useState, useEffect } from 'https://esm.sh/react@18.2.0';
       import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
       import { 
-        import { 
-          Shield, Hammer, Utensils, Pizza, Carrot, Smartphone, Wrench, ChefHat,
-          ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Flag, Skull,
-          Ghost, Bot, User, XCircle, CheckCircle,
-          AlertTriangle, Brain, Check, Star
-} from 'https://esm.sh/lucide-react@0.344.0';
+        Shield, Hammer, Utensils, Pizza, Carrot, Smartphone, Wrench, ChefHat,
+        ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Flag, Skull,
+        Ghost, Bot, User, XCircle, CheckCircle,
+        AlertTriangle, Brain, Check, Zap, Car, Star
       } from 'https://esm.sh/lucide-react@0.344.0';
       import confetti from 'https://esm.sh/canvas-confetti@1.9.2';
 
@@ -186,7 +184,7 @@
       const RoleGame = ({ isHardMode, onComplete }) => {
         const [items, setItems] = useState([]);
         const [score, setScore] = useState(0);
-        const [timeLeft, setTimeLeft] = useState(15); 
+        const [timeLeft, setTimeLeft] = useState(20); // 20 sekunder
         const [feedback, setFeedback] = useState(null);
         
         useEffect(() => {
@@ -412,7 +410,6 @@
             }
           }
 
-          // Uppdatera moves på ett säkert sätt och hantera game over här
           setMoves(prev => {
             const next = prev + 1;
             if (!gameOver && next >= maxMoves) {
@@ -439,7 +436,6 @@
               )}
             </div>
 
-            {/* GRID CONTAINER */}
             <div className="flex-1 flex justify-center items-center overflow-hidden min-h-0 w-full">
               <div 
                 className="grid gap-0.5 bg-gray-800 p-1 rounded border-4 border-gray-700 shadow-2xl w-full max-w-[360px] sm:max-w-[400px] aspect-square"
@@ -509,7 +505,7 @@
         const [feedback, setFeedback] = useState("");
         const [processedCount, setProcessedCount] = useState(0);
 
-        const MAX_VISITORS = 10;
+        const MAX_VISITORS = 10; // 10 gäster
 
         useEffect(() => {
           const types = ['robot', 'robot', 'human', 'alien', 'vip', 'human'];
@@ -521,7 +517,7 @@
         }, []);
 
         useEffect(() => {
-          if (processedCount >= 8) { 
+          if (processedCount >= 10) { 
             onComplete(score >= 30); 
           }
         }, [processedCount, score, onComplete]);
@@ -555,19 +551,24 @@
         };
 
         const getIcon = (type) => {
-  switch(type) {
-    case 'robot':
-      return <Bot size={36} className="text-blue-400" />;
-    case 'human':
-      return <User size={36} className="text-yellow-400" />;
-    case 'alien':
-      return <Ghost size={36} className="text-green-400" />;
-    case 'vip':
-      return <Star size={36} className="text-purple-400" />;
-    default:
-      return null;
-  }
-};
+          switch(type) {
+            case 'robot':
+              return <Bot size={36} className="text-blue-400" />;
+            case 'human':
+              return <User size={36} className="text-yellow-400" />;
+            case 'alien':
+              return <Ghost size={36} className="text-green-400" />;
+            case 'vip':
+              return <Star size={36} className="text-purple-400" />;
+            default:
+              return null;
+          }
+        };
+
+        const formatTypeLabel = (type) => {
+          if (type === 'vip') return 'VIP';
+          return type;
+        };
 
         return (
           <div className="h-full w-full flex flex-col bg-slate-900 relative overflow-hidden">
@@ -610,7 +611,7 @@
                 )}
               </div>
 
-              {/* Neon-skylt ovanför dörren */}
+              {/* Neon-skylt */}
               <div className="mb-2 flex flex-col items-center">
                 <div className="px-3 py-1 rounded-full border-2 border-xlent-accent bg-black/40 shadow-[0_0_12px_rgba(244,211,94,0.8)]">
                   <span className="font-arcade text-[9px] md:text-[10px] text-xlent-accent tracking-[0.2em]">
@@ -626,13 +627,13 @@
 
               <div className="relative w-32 h-40 md:w-36 md:h-48 border-x-8 border-t-8 border-gray-700 rounded-t-full bg-black/60 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] flex items-end justify-center shrink-0">
                 <div className="absolute bottom-0 w-full h-4 bg-gradient-to-t from-blue-900/40 to-transparent"></div>
-                <div className="absolute bottom-3 md:bottom-4 z-10 w-full flex justify-center">
+                <div className="absolute bottom-3 md:bottom-4 z-10 w-full flex justify-center"> 
                   <div className={`visitor-card ${currentVisitor ? 'active' : 'exit'}`}>
                     {currentVisitor && (
                       <div className="bg-gray-800 p-2 rounded-xl border-2 border-gray-500 shadow-2xl w-20 h-28 md:w-24 md:h-32 flex flex-col items-center justify-center gap-2">
                         {getIcon(currentVisitor.type)}
                         <div className="font-arcade text-gray-400 text-[7px] md:text-[8px] uppercase tracking-widest mt-1 border-t border-gray-600 pt-1 w-full text-center">
-                          {currentVisitor.type}
+                          {formatTypeLabel(currentVisitor.type)}
                         </div>
                       </div>
                     )}
@@ -669,7 +670,6 @@
           <div className="h-full bg-xlent-dark overflow-y-auto custom-scrollbar">
             <div className="max-w-3xl mx-auto p-4 md:p-8 lg:p-12 text-white">
               
-              {/* Header */}
               <div className="mb-8 md:mb-12 text-center">
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-xlent-accent font-arcade leading-tight">
                   {MARKETING_DATA.title}
@@ -679,9 +679,7 @@
                 </p>
               </div>
 
-              {/* Grid Content */}
               <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12">
-                {/* Column 1: Utmaningen */}
                 <div className="bg-white/10 p-4 md:p-6 rounded-xl border border-white/20 backdrop-blur-sm">
                   <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-red-300 uppercase tracking-wider">Utmaningen Idag</h3>
                   <ul className="space-y-2 md:space-y-3">
@@ -694,7 +692,6 @@
                   </ul>
                 </div>
 
-                {/* Column 2: Lösningen */}
                 <div className="bg-white/10 p-4 md:p-6 rounded-xl border border-white/20 backdrop-blur-sm">
                   <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-green-300 uppercase tracking-wider">Så Hjälper Vi Er</h3>
                   <ul className="space-y-2 md:space-y-3">
@@ -708,7 +705,6 @@
                 </div>
               </div>
 
-              {/* Benefits Section */}
               <div className="bg-xlent-green/20 p-6 md:p-8 rounded-xl border border-xlent-green mb-8 md:mb-12">
                 <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-xlent-accent uppercase tracking-wider text-center">Ni Får</h3>
                 <div className="grid sm:grid-cols-3 gap-4 md:gap-6">
@@ -723,7 +719,6 @@
                 </div>
               </div>
 
-              {/* CTA */}
               <div className="text-center p-6 md:p-8 bg-black/40 rounded-xl">
                 <h3 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">Kontakt</h3>
                 <p className="mb-4 md:mb-6 text-sm md:text-base text-gray-300">
@@ -774,7 +769,6 @@
 
         const handleLevelComplete = (success) => {
           if (phase.startsWith('bad')) {
-            // Bad levels always lead to the next bad level or the summary
             if (phase === 'bad-role') nextPhase('bad-task');
             if (phase === 'bad-task') nextPhase('bad-context');
             if (phase === 'bad-context') nextPhase('fail-summary');
@@ -800,7 +794,7 @@
                 setTimeout(() => nextPhase('victory'), 3000);
               }
             } else {
-              // Endast ett försök i omgång 2: gå vidare utan omstart
+              // Endast ett försök i omgång 2: gå vidare utan restart
               if (phase === 'good-role') nextPhase('good-task');
               if (phase === 'good-task') nextPhase('good-context');
               if (phase === 'good-context') nextPhase('victory');
@@ -821,7 +815,7 @@
           switch (phase) {
             case 'intro':
               return (
-                <div className="h-full flex flex-col items-center justify-center bg-gray-900 p-4 md:p-8 text-center bg-[url('https://picsum.photos/seed/tech/800/600')] bg-cover bg-blend-overlay">
+                <div className="h-full flex flex-col items-center justify-center bg-gray-900 p-4 md:p-8 textcenter bg-[url('https://picsum.photos/seed/tech/800/600')] bg-cover bg-blend-overlay">
                   <h1 className="text-2xl md:text-4xl font-arcade text-xlent-accent mb-2 md:mb-4 drop-shadow-md">PROMPT MASTER</h1>
                   <p className="text-gray-300 mb-6 md:mb-8 max-w-xs md:max-w-md font-sans text-sm md:text-base">
                     Hur kan du hantera uppgifter med tveksamma instruktioner? Testa dina färdigheter i tre minispel.
@@ -851,7 +845,7 @@
 
             case 'fail-summary':
               return (
-                <div className="h-full flex flex-col items-center justify-center bg-gray-800 p-4 md:p-8 text-center">
+                <div className="h-full flex flex-col itemscenter justify-center bg-gray-800 p-4 md:p-8 text-center">
                   <h2 className="text-xl md:text-2xl font-arcade text-red-500 mb-3 md:mb-4">GAME OVER?</h2>
                   <p className="text-white mb-6 md:mb-8 font-sans text-sm md:text-base max-w-xs md:max-w-md">
                     Det var svårt, eller hur? <br /><br />
